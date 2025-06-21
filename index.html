@@ -5,19 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>המקום של שחר - גרסה דינמית</title>
     <style>
-        body { font-family: Assistant, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; line-height: 1.6; margin: 20px; background-color: #f4f4f4; color: #333; }
-        .container { max-width: 800px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .post { border-bottom: 1px solid #ddd; padding-bottom: 20px; margin-bottom: 20px; }
+        body { font-family: Assistant, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 800px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #d63384; }
+        .post { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
         .post:last-child { border-bottom: none; }
-        .post img { max-width: 100%; height: auto; border-radius: 5px; }
-        .comments-section { background-color: #fafafa; padding: 15px; margin-top: 20px; border-radius: 5px; border: 1px solid #eee; }
-        .comment { border-bottom: 1px dotted #ccc; padding: 10px 0; }
+        .post img { max-width: 100%; height: auto; border-radius: 8px; margin-top: 15px; }
+        .post p { white-space: pre-wrap; } /* שומר על מעברי שורה מה-Sheet */
+        .post-meta { font-size: 0.9em; color: #777; }
+        .comments-section { background-color: #fdfdfd; padding: 15px; margin-top: 20px; border-radius: 5px; border: 1px solid #eee; }
+        .comment { border-bottom: 1px dotted #ccc; padding: 10px 0; font-size: 0.95em; }
         .comment:last-child { border-bottom: none; }
-        .comment small { color: #555; }
-        .comment-form input, .comment-form textarea { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .comment-form button { background-color: #337ab7; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
-        .comment-form button:hover { background-color: #286090; }
-        #loader { text-align: center; font-size: 1.5em; padding: 50px; }
+        .comment-meta { font-size: 0.8em; color: #555; }
+        .comment-form input, .comment-form textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; }
+        .comment-form button { background-color: #0d6efd; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .comment-form button:hover { background-color: #0b5ed7; }
+        #loader { text-align: center; font-size: 1.5em; padding: 50px; color: #555; }
     </style>
 </head>
 <body>
@@ -25,13 +28,16 @@
     <div class="container">
         <h1>המקום של שחר</h1>
         <div id="posts-container">
-            <div id="loader">טוען פוסטים...</div>
+            <div id="loader">טוען פוסטים... 💅</div>
         </div>
     </div>
 
     <script>
-        const WEB_APP_URL = https://script.google.com/macros/s/AKfycbyUDnj8O8pe0tNu8smtsJTBqS-0uNT5vYVeq_ZWEN0V5p6Sg4SFzBJZf5abYOM_ne5NEA/exec
-      
+        // ######################################################################
+        // ##  חשוב! החלף את הטקסט בתוך הגרשיים בכתובת ה-Web App URL שלך!   ##
+        // ######################################################################
+        const WEB_APP_URL = 'הדבק כאן את כתובת ה-API שלך מ-Apps Script (ה-Web App URL)';
+
         document.addEventListener('DOMContentLoaded', loadPosts);
 
         async function loadPosts() {
@@ -44,10 +50,10 @@
                 const posts = await response.json();
                 
                 loader.style.display = 'none';
-                postsContainer.innerHTML = ''; // נקה תוכן קודם
+                postsContainer.innerHTML = ''; 
 
                 if (posts.length === 0) {
-                    postsContainer.innerHTML = '<p>אין פוסטים להצגה כרגע.</p>';
+                    postsContainer.innerHTML = '<p>אוי לא! אין פוסטים חדשים כרגע. חזרו בקרוב!</p>';
                     return;
                 }
 
@@ -57,30 +63,28 @@
                     postElement.id = `post-${post.id}`;
                     postElement.innerHTML = `
                         <h2>${post.title}</h2>
-                        <p><small>פורסם בתאריך: ${new Date(post.created_at).toLocaleString('he-IL')}</small></p>
-                        <img src="${post.image_url}" alt="${post.title}">
-                        <p>${post.content.replace(/\n/g, '<br>')}</p>
+                        <p class="post-meta">פורסם: ${new Date(post.created_at).toLocaleString('he-IL')}</p>
+                        <p>${post.content}</p>
+                        <img src="${post.image_url}" alt="${post.title}" onerror="this.style.display='none'">
                         
                         <div class="comments-section">
-                            <h3>תגובות</h3>
-                            <div class="comments-list" id="comments-for-${post.id}">
-                                <p>טוען תגובות...</p>
-                            </div>
+                            <h3>מה אתם אומרים? 💬</h3>
+                            <div class="comments-list" id="comments-for-${post.id}"><p>טוען תגובות...</p></div>
                             <div class="comment-form">
-                                <h4>הוסף תגובה</h4>
+                                <h4>השאירו תגובה</h4>
                                 <input type="text" id="author-${post.id}" placeholder="שם" required>
-                                <textarea id="comment-text-${post.id}" rows="3" placeholder="תוכן התגובה" required></textarea>
-                                <button onclick="addComment('${post.id}')">שלח תגובה</button>
+                                <textarea id="comment-text-${post.id}" rows="3" placeholder="מה חשבתם?" required></textarea>
+                                <button onclick="addComment('${post.id}')">שליחה</button>
                             </div>
                         </div>
                     `;
                     postsContainer.appendChild(postElement);
-                    loadComments(post.id); // טען תגובות עבור הפוסט
+                    loadComments(post.id); 
                 });
 
             } catch (error) {
                 console.error('Error fetching posts:', error);
-                loader.innerText = 'שגיאה בטעינת הפוסטים. נסה לרענן את הדף.';
+                loader.innerText = 'אופסי! משהו השתבש בטעינת הפוסטים. נסו לרענן.';
             }
         }
 
@@ -93,14 +97,15 @@
 
                 commentsContainer.innerHTML = '';
                 if (comments.length === 0) {
-                    commentsContainer.innerHTML = '<p>אין עדיין תגובות. היה הראשון להגיב!</p>';
+                    commentsContainer.innerHTML = '<p>אף אחד עוד לא הגיב. היו הראשונים!</p>';
                 } else {
                     comments.forEach(comment => {
                         const commentElement = document.createElement('div');
                         commentElement.className = 'comment';
                         commentElement.innerHTML = `
-                            <p><strong>${comment.author}</strong> <small>(${new Date(comment.created_at).toLocaleString('he-IL')})</small></p>
+                            <p><strong>${comment.author}</strong></p>
                             <p>${comment.comment_text}</p>
+                            <p class="comment-meta">${new Date(comment.created_at).toLocaleString('he-IL')}</p>
                         `;
                         commentsContainer.appendChild(commentElement);
                     });
@@ -114,43 +119,42 @@
         async function addComment(postId) {
             const authorInput = document.getElementById(`author-${postId}`);
             const commentTextInput = document.getElementById(`comment-text-${postId}`);
-            
             const author = authorInput.value.trim();
             const commentText = commentTextInput.value.trim();
 
             if (!author || !commentText) {
-                alert('יש למלא את כל השדות.');
+                alert('חובה למלא שם ותוכן תגובה!');
                 return;
             }
 
-            const commentData = {
-                action: 'addComment',
-                postId: postId,
-                author: author,
-                commentText: commentText
-            };
+            const commentData = { action: 'addComment', postId: postId, author: author, commentText: commentText };
 
             try {
-                const response = await fetch(WEB_APP_URL, {
+                // אין צורך לקרוא את התשובה בגלל no-cors, אז רק שולחים
+                fetch(WEB_APP_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // נדרש לרוב עבור Apps Script POST פשוט
-                    cache: 'no-cache',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(commentData)
+                    mode: 'no-cors', 
+                    body: JSON.stringify(commentData),
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
-                // בגלל מגבלות של no-cors, לא נוכל לקרוא את התשובה.
-                // נניח שהפעולה הצליחה ונרענן את התגובות.
-                alert('התגובה נוספה בהצלחה!');
+                alert('תודה! התגובה נוספה בהצלחה.');
                 authorInput.value = '';
                 commentTextInput.value = '';
-                loadComments(postId); // רענן את רשימת התגובות
+
+                // אופטימיות: הוסף את התגובה מיד לממשק המשתמש במקום לחכות לטעינה מחדש
+                const commentsContainer = document.getElementById(`comments-for-${postId}`);
+                if (commentsContainer.querySelector('p')?.innerText.includes('אף אחד עוד לא הגיב')) {
+                    commentsContainer.innerHTML = '';
+                }
+                const newCommentElement = document.createElement('div');
+                newCommentElement.className = 'comment';
+                newCommentElement.innerHTML = `<p><strong>${author}</strong></p><p>${commentText}</p><p class="comment-meta">עכשיו</p>`;
+                commentsContainer.appendChild(newCommentElement);
 
             } catch (error) {
                 console.error('Error adding comment:', error);
-                alert('שגיאה בהוספת התגובה.');
+                alert('אוי, שגיאה בהוספת התגובה. נסו שוב.');
             }
         }
     </script>
